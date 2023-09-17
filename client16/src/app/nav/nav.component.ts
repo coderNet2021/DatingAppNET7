@@ -28,4 +28,7 @@ this.accountService.login(this.model).subscribe({
       //complete:
     });
   }
+  logout(){
+    this.loggedIn=false;
+  }
 }
