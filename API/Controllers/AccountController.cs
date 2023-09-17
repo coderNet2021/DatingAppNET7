@@ -47,7 +47,7 @@ namespace API.Controllers
         {
             var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == loginDto.Username);
 
-            if (user == null) return Unauthorized();
+            if (user == null) return Unauthorized("invalid username");
 
             using var hmac = new HMACSHA512(user.PasswordSalt);//when we pass the salt as argument we have the algrithm that causes the has and saved it in hmac
             //so now we compare the 2 byte arrays of the PasswordHash and for the hashed value of the loginDTO.Password
@@ -55,7 +55,7 @@ namespace API.Controllers
 
             for (int i = 0; i < computedHash.Length; i++)
             {
-                if (computedHash[i] != user.PasswordHash[i]) return Unauthorized();
+                if (computedHash[i] != user.PasswordHash[i]) return Unauthorized("invalid password");
             }
 
             //else 3an kell shi
