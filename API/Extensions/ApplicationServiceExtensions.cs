@@ -1,3 +1,4 @@
+using Api.Helpers;
 using API.Data;
 using API.Interfaces;
 using API.Services;
@@ -18,6 +19,8 @@ namespace API.Extensions
             services.AddScoped<IUserRepository, UserRepository>();
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+            services.Configure<CloudinarySettings>(config.GetSection("CloudinarySettings"));
 
             return services;
         }
