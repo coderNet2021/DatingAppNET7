@@ -12,6 +12,7 @@ export class RegisterComponent implements OnInit {
   @Output() cancelRegister = new EventEmitter();
   model:any={};
   registerForm: FormGroup = new FormGroup({});
+  maxDate: Date = new Date();
 
   constructor(private accountService : AccountService,
     private toastr:ToastrService,
@@ -20,9 +21,14 @@ export class RegisterComponent implements OnInit {
   }
 initializeForm(){
   this.registerForm = this.fb.group({
-    username: ['',Validators.required ],
-    password: ['',[Validators.required,Validators.minLength(4),Validators.maxLength(8)]],
-    confirmPassword: ['',[Validators.required,this.matchValue('password')]]
+    gender: ['male'],
+    username: ['', Validators.required],
+    knownAs: ['', Validators.required],
+    dateOfBirth: ['', Validators.required],
+    city: ['', Validators.required],
+    country: ['', Validators.required],
+    password: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(8)]],
+    confirmPassword: ['', [Validators.required, this.matchValue('password')]]
   });
   this.registerForm.controls['password'].valueChanges.subscribe({
     next:()=>this.registerForm.controls['confirmPassword'].updateValueAndValidity()
@@ -37,6 +43,7 @@ return (control:AbstractControl)=>{
 
   ngOnInit(): void {
     this.initializeForm();
+    this.maxDate.setFullYear(this.maxDate.getFullYear() - 18);
 
   }
 
