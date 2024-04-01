@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, take } from 'rxjs';
 import { Pagination } from 'src/app/_models/Pagination';
+import { User } from 'src/app/_models/User';
 import { Member } from 'src/app/_models/member';
+import { UserParams } from 'src/app/_models/userParams';
+import { AccountService } from 'src/app/_services/account.service';
 import { MembersService } from 'src/app/_services/members.service';
 
 @Component({
@@ -13,9 +16,17 @@ export class MemberListComponent implements OnInit {
  // members$:Observable<Member[]> | undefined;
  members :Member[]=[];
   pagination : Pagination | undefined;
-  pageNumber =1;
-  pageSize = 5;
-  constructor(private memberService :MembersService){
+  userParams: UserParams | undefined;
+  user: User | undefined;
+  constructor(private memberService :MembersService, private accountService : AccountService){
+    this.accountService.currentUser$.pipe(take(1)).subscribe({
+      next:user=>{
+        if(user){
+          this.userParams = new UserParams(user);
+          this.user = user;
+        }
+      }
+    });
 
   }
   ngOnInit(): void {
@@ -24,10 +35,12 @@ export class MemberListComponent implements OnInit {
 
   loadMembers(){
    //this.members$ = this.memberService.getMembers();
-   this.memberService.getMembers(this.pageNumber,this.pageSize).subscribe({
+   if(!this.userParams) return;
+   this.memberService.getMembers(this.userParams).subscribe({
     next:response =>{
       if(response.result && response.pagination){
         this.members = response.result;
+        console.log(this.members);
         this.pagination =response.pagination;
       }
     }
@@ -35,8 +48,9 @@ export class MemberListComponent implements OnInit {
   }
 
   pageChanged(event : any){
-    if(this.pageNumber !==event.page){
-      this.pageNumber = event.page;
+    console.log(event);
+    if(this.userParams && this.userParams?.pageNumber !==event.page){
+      this.userParams.pageNumber= event.page;
       this.loadMembers();
     }
 
