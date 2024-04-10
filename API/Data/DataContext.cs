@@ -12,5 +12,28 @@ namespace API.Data
 
         //AppUser comes from API.Entities
         public DbSet<AppUser> Users { get; set; }
+        public DbSet<UserLike> Likes { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.Entity<UserLike>()
+                .HasKey(k => new { k.SourceUserId, k.TargetUserId });
+
+            //lisa decided to like peter and tom and gerald
+            builder.Entity<UserLike>()
+                .HasOne(s => s.SourceUser)
+                .WithMany(l => l.LikedUsers)
+                .HasForeignKey(s => s.SourceUserId)
+                .OnDelete(DeleteBehavior.Cascade);//if a user delete his profile from the app , we should delete his likes also.
+
+            //lisa is liked by bob and tom and jhon
+            builder.Entity<UserLike>()
+                .HasOne(s => s.TargetUser)
+                .WithMany(l => l.LikedByUsers)
+                .HasForeignKey(s => s.TargetUserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        }
     }
 }
